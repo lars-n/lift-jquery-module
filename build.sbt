@@ -1,14 +1,15 @@
-import LiftModuleKeys.{liftVersion, liftEdition}
+lazy val liftVersion = settingKey[String]("Version number of the Lift Web Framework")
+lazy val liftEdition = settingKey[String]("Lift Edition (short version number to append to artifact name)")
 
 moduleName := "lift-jquery-module"
 organization := "net.liftmodules"
-version in ThisBuild := "2.11-SNAPSHOT"
-liftVersion in ThisBuild := { liftVersion ?? "3.3.0" }.value
-liftEdition in ThisBuild := { liftVersion apply { _.substring(0,3) } }.value
+version := "2.12-SNAPSHOT"
+liftVersion := { liftVersion ?? "3.4.3" }.value
+liftEdition := { liftVersion apply { _.substring(0,3) } }.value
 moduleName := { name.value + "_" + liftEdition.value }
-scalaVersion  in ThisBuild := "2.12.6"
+scalaVersion := "2.13.6"
 scalacOptions ++= Seq("-unchecked", "-deprecation")
-crossScalaVersions := Seq("2.12.6", "2.11.11")
+crossScalaVersions := Seq(scalaVersion.value, "2.12.14")
 
 logLevel := Level.Info  
 
@@ -17,32 +18,11 @@ resolvers ++= Seq(
   "Scala" at "https://oss.sonatype.org/content/groups/scala-tools/"
 )
 
-libraryDependencies in ThisBuild ++= {
+ThisBuild / libraryDependencies ++= {
   "net.liftweb" %% "lift-webkit"  % liftVersion.value % "provided" ::
-    "net.liftweb" %% "lift-testkit" % liftVersion.value % "provided" ::
-    Nil
+  "net.liftweb" %% "lift-testkit" % liftVersion.value % "provided" ::
+  Nil
 }
-//libraryDependencies <++= liftVersion { v =>
-//    "net.liftweb" %% "lift-webkit"  % v % "provided" ::
-//    "net.liftweb" %% "lift-testkit" % v % "provided" ::
-//    Nil
-//}
-
-//libraryDependencies <++= (scalaVersion,liftVersion) { (sv,lv) =>
-//  ((sv,lv) match {
-//      case ("2.9.2",_) | ("2.9.1",_) | ("2.9.1-1",_) => "org.specs2" %% "specs2" % "1.12.3" % "test"
-//      case ("2.10.4",_) => "org.specs2" %% "specs2" % "1.13" % "test"
-//      case (_,"2.6.2") => "org.specs2" %% "specs2" % "2.3.11" % "test"
-//      case (_,_) => "org.specs2" %% "specs2-core" % "3.8.6" % "test"
-//      // case (_,_) => "org.specs2" %% "specs2" % "3.7" % "test"
-// }) ::
-//    ((sv,lv) match {
-//      case ("2.10.4",_) | ("2.9.2",_) | ("2.9.1",_) | ("2.9.1-1",_) => "org.scalacheck" %% "scalacheck" % "1.10.0" % "test"
-//      case (_,"2.6.2") => "org.scalacheck" %% "scalacheck" % "1.11.4" % "test"
-//      case (_,_) => "org.specs2" %% "specs2-scalacheck" % "3.8.6" % "test"
-//      }) ::
-//  Nil
-//}
 
 libraryDependencies ++= { 
   "ch.qos.logback" % "logback-classic" % "1.0.0" % "provided" ::
@@ -50,41 +30,11 @@ libraryDependencies ++= {
   Nil
 }
 
-libraryDependencies in ThisBuild ++= {
-  ((scalaVersion.value, liftVersion.value) match {
-    case ("2.10.4", _) | ("2.9.2", _) | ("2.9.1", _) | ("2.9.1-1", _) =>
-      "org.specs2" %% "specs2" % "1.12.3" % "test"
-    case ("2.11.7", "2.6.2") | ("2.11.7", "2.6.3") =>
-      "org.specs2" %% "specs2" % "2.3.11" % "test"
-    case (_, "3.0.0") => "org.specs2" %% "specs2"      % "3.7"   % "test"
-    case (_, "3.0.1") | (_, "3.0.2") => "org.specs2" %% "specs2-core" % "3.8.6" % "test"
-    case (_, _) =>
-      "org.specs2" %% "specs2-core" % "3.8.6" % "test" //lift 3.1.x
-  }) ::
-    ((scalaVersion.value, liftVersion.value) match {
-      case ("2.10.4", _) | ("2.9.2", _) | ("2.9.1", _) | ("2.9.1-1", _) =>
-        "org.specs2" %% "specs2" % "1.12.3" % "test"
-      case ("2.11.7", "2.6.2") | ("2.11.7", "2.6.3") =>
-        "org.specs2" %% "specs2" % "2.3.11" % "test"
-      case (_, "3.0.0") =>
-        "org.specs2" %% "specs2" % "3.7" % "test" //no mather extras for 3.7
-      case (_, "3.0.1") | (_, "3.0.2") =>
-        "org.specs2" %% "specs2-matcher-extra" % "3.8.6" % "test"
-      case (_, _) =>
-        "org.specs2" %% "specs2-matcher-extra" % "3.8.6" % "test" //lift 3.1.x
-    }) ::
-    ((scalaVersion.value, liftVersion.value) match {
-      case (_, "2.6.2") | (_, "2.6.3") =>
-        "org.scalacheck" %% "scalacheck" % "1.10.1" % "test"
-      case (_, "3.0.0") =>
-        "org.specs2" %% "specs2-scalacheck" % "3.7" % "test"
-      case (_, "3.0.1") | (_, "3.0.2") =>
-        "org.specs2" %% "specs2-scalacheck" % "3.8.6" % "test"
-      case (_, _) =>
-        "org.specs2" %% "specs2-scalacheck" % "3.8.6" % "test" //lift 3.1.x
-    }) ::
-    Nil
-}
+ThisBuild / libraryDependencies ++= Seq(
+   "org.specs2" %% "specs2-core" % "4.12.12" % "test",
+   "org.specs2" %% "specs2-matcher-extra" % "4.12.12" % "test", //lift 3.1.x
+   "org.specs2" %% "specs2-scalacheck" % "4.12.12" % "test" //lift 3.1.x
+)
 
 //################################################################
 //#### Publish to sonatype org
@@ -96,7 +46,7 @@ credentials += Credentials(Path.userHome / ".sbt" / "liftmodules" /".credentials
 
 credentials += Credentials( file("/private/liftmodules/sonatype.credentials") )
 
-publishTo in ThisBuild := {
+ThisBuild / publishTo := {
   version { v: String =>
     val sonatype = "https://oss.sonatype.org/"
     if (v.trim.endsWith("SNAPSHOT"))
@@ -108,7 +58,7 @@ publishTo in ThisBuild := {
 
 publishMavenStyle := true
 
-publishArtifact in Test := false
+Test / publishArtifact := false
 
 pomIncludeRepository := { x => false }
 
