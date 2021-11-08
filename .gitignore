@@ -18,3 +18,5 @@ project/plugins/project/
 /.project
 /.travis.yml~
 /.idea/
+
+.bsp
