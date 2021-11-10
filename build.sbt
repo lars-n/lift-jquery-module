@@ -16,6 +16,7 @@ lazy val liftVersion = settingKey[String]("Version number of the Lift Web Framew
 lazy val liftEdition = settingKey[String]("Lift Edition (short version number to append to artifact name)")
 
 moduleName := "lift-jquery-module"
+name := "lift-jquery-module"
 organization := "net.liftmodules"
 version := "2.12-SNAPSHOT"
 liftVersion := { liftVersion ?? "3.4.3" }.value
