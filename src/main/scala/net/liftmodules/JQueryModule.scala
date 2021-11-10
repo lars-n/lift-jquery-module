@@ -18,7 +18,7 @@ package object JQueryModule {
    * The above example just calls init without specifying init
    * params so the default JQuery version will be used.
    */
-  def init() {
+  def init(): Unit = {
     LiftRules.addToPackages("net.liftmodules.JQueryModule")
     ResourceServer.allow {
       case "jquery.js" :: nil => true
