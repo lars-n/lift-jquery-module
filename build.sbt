@@ -1,3 +1,17 @@
+import java.util.Properties
+
+val globalSbtProperties = {
+  val prop = new Properties()
+  IO.load(prop, Path.userHome / ".sbt" / "config" / "global-sbt-config.properties")
+  prop
+}
+
+val publishRepoUrl = globalSbtProperties.getProperty("publishRepoUrl")
+val publishRepoUser = globalSbtProperties.getProperty("publishRepoUser")
+val keyFile = Path.userHome / ".ssh" / "id_rsa"
+val publishSshRepo = Resolver.ssh("publish repo", publishRepoUrl,22)(Resolver.ivyStylePatterns) as (publishRepoUser, keyFile) withPublishPermissions("0755")
+//credentials += Credentials(Path.userHome / ".sbt" / "credentials" / ".publish-credentials")
+
 lazy val liftVersion = settingKey[String]("Version number of the Lift Web Framework")
 lazy val liftEdition = settingKey[String]("Lift Edition (short version number to append to artifact name)")
 
@@ -36,25 +50,7 @@ ThisBuild / libraryDependencies ++= Seq(
    "org.specs2" %% "specs2-scalacheck" % "4.12.12" % "test" //lift 3.1.x
 )
 
-//################################################################
-//#### Publish to sonatype org
-//## 
-//##  
-//## 
-//################################################################
-credentials += Credentials(Path.userHome / ".sbt" / "liftmodules" /".credentials" )
-
-credentials += Credentials( file("/private/liftmodules/sonatype.credentials") )
-
-ThisBuild / publishTo := {
-  version { v: String =>
-    val sonatype = "https://oss.sonatype.org/"
-    if (v.trim.endsWith("SNAPSHOT"))
-      Some("snapshots" at sonatype + "content/repositories/snapshots")
-    else
-      Some("releases" at sonatype + "service/local/staging/deploy/maven2")
-  }
-}.value
+ThisBuild / publishTo := Some(publishSshRepo)
 
 publishMavenStyle := true
 
